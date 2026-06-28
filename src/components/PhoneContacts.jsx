@@ -1,20 +1,29 @@
-import { Component } from "react";
 import styles from "./PhoneContact.module.css";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteContact } from "../redux/contactsSlice";
 
-class PhoneContacts extends Component {
-  render() {
-    const { contacts, onDeleteContact } = this.props;
-    return (
-      <ul className={styles.contactList}>
-        {contacts.map((contact) => (
-          <li className={styles.contactItem} key={contact.id}>
-            {contact.name} : {contact.number}
-            <button onClick={() => onDeleteContact(contact.id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
-    );
-  }
+function PhoneContacts() {
+  const dispatch = useDispatch();
+
+  const contacts = useSelector(state => state.contacts.items);
+  const filter = useSelector(state => state.filter);
+
+  const filteredContacts = contacts.filter(contact =>
+    contact.name.toLowerCase().includes(filter.toLowerCase())
+  );
+
+  return (
+    <ul className={styles.contactList}>
+      {filteredContacts.map(contact => (
+        <li className={styles.contactItem} key={contact.id}>
+          {contact.name} : {contact.number}
+          <button onClick={() => dispatch(deleteContact(contact.id))}>
+            Delete
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
 }
 
 export default PhoneContacts;

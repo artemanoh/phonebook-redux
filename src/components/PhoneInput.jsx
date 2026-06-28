@@ -1,43 +1,50 @@
-import { Component } from "react";
 import styles from './PhoneInput.module.css';
+import { useDispatch } from 'react-redux';
+import { useState } from 'react';
+import { addContact } from '../redux/contactsSlice';
+import { nanoid } from 'nanoid';
 
-class PhoneInput extends Component {
-  state = {
+function PhoneInput() {
+  const dispatch = useDispatch();
+
+  const [form, setForm] = useState({
     name: '',
     number: ''
-  };
+  });
 
-  handleChange = (event) => {
+  const handleChange = (event) => {
     const { name, value } = event.target;
-    this.setState({ [name]: value });
+    setForm({ ...form, [name]: value });
   };
 
-  handleSubmit = (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
-    this.props.onAddContact(this.state.name, this.state.number);
-    this.setState({ name: '', number: '' });
+    dispatch(addContact({
+  id: nanoid(),
+  name: form.name,
+  number: form.number
+}));
+    setForm({ name: '', number: '' });
   };
 
-  render() {
-    const { name, number} = this.state;
-    return (
-      <form onSubmit={this.handleSubmit} className={styles.phoneForm}>
-        <input
-          type="text"
-          name="name"
-          value={name}
-          onChange={this.handleChange}
-          pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я]+)*)*$"
-          title="Name may contain only letters, apostrophe, dash and spaces"
-          required
+  return (
+    <form onSubmit={handleSubmit} className={styles.phoneForm}>
+      <input
+        type="text"
+        name="name"
+        value={form.name}
+        onChange={handleChange}
+        pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я]+)*)*$"
+        title="Name may contain only letters, apostrophe, dash and spaces"
+        required
           placeholder="Enter name"
           className={styles.inputField}
         />
         <input
           type="tel"
           name="number"
-          value={number}
-          onChange={this.handleChange}
+          value={form.number}
+          onChange={handleChange}
           pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
           title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
           required
@@ -48,6 +55,6 @@ class PhoneInput extends Component {
       </form>
     );
   }
-}
+
 
 export default PhoneInput;
